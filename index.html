@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gustagumi • Gestão do Ateliê</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="brand"><img src="logo.png.jpeg" alt="Gustagumi Amigurumi"><div><b>Gustagumi</b><small>Gestão do Ateliê</small></div></div>
+  <nav>
+    <button class="nav active" data-section="inicio">🏠 <span>Início</span></button>
+    <button class="nav" data-section="pedidos">📝 <span>Pedidos</span></button>
+    <button class="nav" data-section="clientes">👥 <span>Clientes</span></button>
+    <button class="nav" data-section="agenda">📅 <span>Agenda</span></button>
+    <button class="nav" data-section="financeiro">💰 <span>Financeiro</span></button>
+    <button class="nav" data-section="calculadora">🧮 <span>Calculadora</span></button>
+  </nav>
+  <div class="side-note">Organize encomendas, custos e pagamentos em um só lugar. 🧶</div>
+  <div class="backup-box">
+    <button class="secondary wide" id="exportData">💾 Fazer backup</button>
+    <button class="secondary wide" id="importDataBtn">📥 Restaurar backup</button>
+    <input id="importData" type="file" accept="application/json" hidden>
+  </div>
+</aside>
+
+<main class="main">
+<header class="topbar">
+  <div><span class="eyebrow">GUSTAGUMI • ATELIÊ</span><h1 id="pageTitle">Olá! 👋</h1></div>
+  <button class="primary" id="quickNew">+ Novo pedido</button>
+</header>
+
+<section id="inicio" class="section active">
+  <div class="hero"><div><span>SEU ATELIÊ ORGANIZADO</span><h2>Do pedido ao pagamento.</h2><p>Controle encomendas, custos, lucro, clientes e entregas.</p></div><div class="hero-art">🧶<br><small>feito à mão</small></div></div>
+  <div class="stats" id="stats"></div>
+  <div class="two-cols">
+    <div class="panel"><div class="panel-title"><h3>Próximas entregas</h3><button class="link" data-go="agenda">Ver agenda →</button></div><div id="homeAgenda"></div></div>
+    <div class="panel"><div class="panel-title"><h3>Resumo financeiro</h3><button class="link" data-go="financeiro">Ver financeiro →</button></div><div id="homeFinance"></div></div>
+  </div>
+</section>
+
+<section id="pedidos" class="section">
+  <div class="section-head"><div><h2>Pedidos</h2><p>Cadastre encomendas e gere orçamentos.</p></div><button class="primary" id="newPedido">+ Novo pedido</button></div>
+  <div class="toolbar"><input id="searchPedido" placeholder="🔎 Buscar cliente ou produto..."><select id="filterPedido"><option value="">Todos os status</option><option>Aguardando</option><option>Em produção</option><option>Pronto</option><option>Entregue</option></select></div>
+  <div id="pedidoList" class="cards"></div>
+</section>
+
+<section id="clientes" class="section">
+  <div class="section-head"><div><h2>Clientes</h2><p>Contatos e histórico de encomendas.</p></div><button class="primary" id="newCliente">+ Novo cliente</button></div>
+  <div class="toolbar"><input id="searchCliente" placeholder="🔎 Buscar cliente..."></div>
+  <div id="clienteList" class="cards"></div>
+</section>
+
+<section id="agenda" class="section">
+  <div class="section-head"><div><h2>Agenda de entregas</h2><p>Veja os prazos e pedidos de cada dia.</p></div></div>
+  <div class="calendar-head"><button class="secondary" id="prevMonth">‹</button><h3 id="monthLabel"></h3><button class="secondary" id="nextMonth">›</button></div>
+  <div id="calendar" class="calendar"></div>
+  <div id="dayDetails" class="panel day-details"></div>
+</section>
+
+<section id="financeiro" class="section">
+  <div class="section-head"><div><h2>Controle financeiro</h2><p>Receitas, custos, lucro e valores a receber.</p></div><button class="primary" id="newExpense">+ Registrar custo</button></div>
+  <div class="finance-cards" id="financeCards"></div>
+  <div class="panel finance-summary">
+    <div class="panel-title"><h3>Resumo</h3><span class="muted">Visão rápida do seu ateliê</span></div>
+    <div id="financeSummary"></div>
+  </div>
+  <div class="two-cols">
+    <div class="panel"><h3>Pedidos e recebimentos</h3><div id="financeList"></div></div>
+    <div class="panel"><h3>Custos registrados</h3><div id="expenseList"></div></div>
+  </div>
+</section>
+
+<section id="calculadora" class="section">
+  <div class="section-head">
+    <div><h2>Calculadora de preço</h2><p>Descubra o custo, o preço sugerido e o lucro da sua peça.</p></div>
+  </div>
+
+  <div class="calc-layout">
+    <div class="panel">
+      <h3>1. Materiais</h3>
+      <p class="muted">Cadastre o preço do pacote/rolo e quanto você utilizou.</p>
+      <div id="materialRows"></div>
+      <button class="secondary" id="addMaterial">+ Adicionar material</button>
+
+      <h3 class="calc-subtitle">2. Produção</h3>
+      <div class="grid">
+        <label>Tempo de produção (horas)
+          <input id="calcHoras" type="number" min="0" step="0.1" value="1">
+        </label>
+        <label>Valor da mão de obra por hora (R$)
+          <input id="calcHoraValor" type="number" min="0" step="0.01" value="15">
+        </label>
+      </div>
+
+      <h3 class="calc-subtitle">3. Venda</h3>
+      <div class="grid">
+        <label>Lucro desejado (%)
+          <input id="calcLucroPct" type="number" min="0" step="1" value="30">
+        </label>
+        <label>Taxas/despesas extras (R$)
+          <input id="calcTaxas" type="number" min="0" step="0.01" value="0">
+        </label>
+      </div>
+
+      <div class="calc-actions">
+        <button class="secondary" id="clearCalc">Limpar</button>
+        <button class="primary" id="saveCalc">Salvar cálculo</button>
+      </div>
+    </div>
+
+    <div class="panel calc-result">
+      <div class="calc-result-top">
+        <span>RESULTADO</span>
+        <strong id="calcPrice">R$ 0,00</strong>
+      </div>
+      <div class="result-line"><span>Custo dos materiais</span><b id="calcMaterials">R$ 0,00</b></div>
+      <div class="result-line"><span>Mão de obra</span><b id="calcLabor">R$ 0,00</b></div>
+      <div class="result-line"><span>Taxas/despesas</span><b id="calcFees">R$ 0,00</b></div>
+      <div class="result-line total-line"><span>Custo total</span><b id="calcCost">R$ 0,00</b></div>
+      <div class="result-line"><span>Lucro estimado</span><b id="calcProfit">R$ 0,00</b></div>
+      <div class="result-line"><span>Lucro (%)</span><b id="calcProfitPct">0%</b></div>
+      <button class="primary wide" id="useCalcInOrder">Usar preço no novo pedido</button>
+      <p class="calc-note">O preço sugerido é calculado como: custo total × (1 + lucro desejado).</p>
+    </div>
+  </div>
+
+  <div class="panel saved-calcs">
+    <div class="panel-title"><h3>Cálculos salvos</h3><span class="muted">Você pode reutilizar como referência.</span></div>
+    <div id="savedCalcList"></div>
+  </div>
+</section>
+
+</main>
+</div>
+
+<!-- Pedido -->
+<div class="modal hidden" id="modal"><div class="modal-box">
+<div class="modal-top"><h2 id="modalTitle">Novo pedido</h2><button class="close" id="closeModal">×</button></div>
+<form id="pedidoForm">
+<input type="hidden" id="pedidoId">
+<div class="grid"><label>Cliente*<input id="pCliente" required placeholder="Nome do cliente"></label><label>WhatsApp<input id="pWhats" placeholder="(00) 00000-0000"></label></div>
+<div class="grid"><label>Produto*<select id="pProduto" required><option value="">Selecione</option><option>Amigurumi</option><option>Tapete</option><option>Jogo americano</option><option>Chaveiro</option><option>Porta-copo</option><option>Macramé</option><option>Outro</option></select></label><label>Quantidade<input id="pQtd" type="number" min="1" value="1"></label></div>
+<div class="grid"><label>Cor / tamanho<input id="pDetalhes" placeholder="Ex.: rosa, 30 cm"></label><label>Entrega<input id="pPrazo" type="date"></label></div>
+<label>Descrição<textarea id="pDesc" rows="3" placeholder="Detalhes da encomenda..."></textarea></label>
+<div class="grid"><label>Valor unitário (R$)*<input id="pUnit" type="number" step=".01" min="0" required></label><label>Desconto (R$)<input id="pDescR" type="number" step=".01" min="0" value="0"></label></div>
+<div class="grid"><label>Materiais/custos (R$)<input id="pCusto" type="number" step=".01" min="0" value="0"></label><label>Valor pago (R$)<input id="pPago" type="number" step=".01" min="0" value="0"></label></div>
+<div class="grid"><label>Status<select id="pStatus"><option>Aguardando</option><option>Em produção</option><option>Pronto</option><option>Entregue</option></select></label><label>Forma de pagamento<select id="pPagamento"><option>Não informado</option><option>Pix</option><option>Dinheiro</option><option>Cartão</option><option>Transferência</option></select></label></div>
+<label>Foto do produto (opcional)<input id="pFoto" type="file" accept="image/*"></label>
+<div id="photoPreview" class="photo-preview"></div>
+<div class="total-preview"><span>Total</span><strong id="pTotal">R$ 0,00</strong><small id="pRestante">Restante: R$ 0,00</small><small id="pLucro">Lucro estimado: R$ 0,00</small></div>
+<button class="primary wide">Salvar pedido</button>
+</form></div></div>
+
+<!-- Cliente -->
+<div class="modal hidden" id="clienteModal"><div class="modal-box small">
+<div class="modal-top"><h2>Novo cliente</h2><button class="close" id="closeCliente">×</button></div>
+<form id="clienteForm"><input type="hidden" id="cId"><label>Nome*<input id="cNome" required></label><label>WhatsApp<input id="cWhats"></label><label>Instagram<input id="cInstagram" placeholder="@usuario"></label><label>Observações<textarea id="cObs" rows="3"></textarea></label><button class="primary wide">Salvar cliente</button></form>
+</div></div>
+
+<!-- Custo -->
+<div class="modal hidden" id="expenseModal"><div class="modal-box small">
+<div class="modal-top"><h2>Registrar custo</h2><button class="close" id="closeExpense">×</button></div>
+<form id="expenseForm"><label>Descrição*<input id="eDesc" required placeholder="Ex.: barbante"></label><div class="grid"><label>Valor (R$)*<input id="eValor" type="number" step=".01" min="0" required></label><label>Data<input id="eData" type="date"></label></div><button class="primary wide">Salvar custo</button></form>
+</div></div>
+
+<!-- Orçamento -->
+<div class="modal hidden" id="quoteModal"><div class="modal-box print-area">
+<div class="quote" id="quoteContent"></div>
+<div class="quote-actions"><button class="primary" id="printQuote">🖨️ Imprimir</button><button class="secondary" id="quoteWhats">📱 WhatsApp</button><button class="secondary" id="closeQuote">Fechar</button></div>
+</div></div>
+
+<script src="script.js"></script>
+</body></html>
